@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- PREMIUM CUSTOM SCROLLBAR --- */
+
+/* 1. Ukuran Dasar */
+::-webkit-scrollbar {
+  width: 12px;  /* Sedikit lebih lebar biar detailnya kelihatan */
+  height: 12px;
+}
+
+/* 2. Track (Lintasan) - Kita buat samar-samar agar tidak 'polosan' */
+::-webkit-scrollbar-track {
+  background-color: rgba(76, 175, 80, 0.05); /* Hijau Sage SANGAT transparan */
+  border-radius: 10px;
+  margin-block: 5px; /* Memberi sedikit jarak di atas dan bawah */
+}
+
+/* 3. Thumb (Bagian yang bergerak) - INI KUNCINYA */
+::-webkit-scrollbar-thumb {
+  border-radius: 10px; /* Bulat sempurna */
+  
+  /* RAHASIA 1: Gradient halus biar terlihat 3D/Timbul */
+  background-image: linear-gradient(135deg, #66BB6A 0%, #2E7D32 100%);
+  
+  /* RAHASIA 2: Shadow lembut biar terlihat 'melayang' dari track */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15), inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+  
+  /* Trik agar ada jarak 'bernapas' antara thumb dan track */
+  border: 3px solid transparent;
+  background-clip: content-box;
+  transition: all 0.3s ease;
+}
+
+/* 4. Saat Diarahkan Mouse (Hover) - Jadi lebih 'hidup' */
+::-webkit-scrollbar-thumb:hover {
+  /* Warna gradien jadi lebih terang dan cerah */
+  background-image: linear-gradient(135deg, #81C784 0%, #388E3C 100%);
+  /* Shadow sedikit lebih tegas */
+  box-shadow: 0 5px 8px rgba(46, 125, 50, 0.25), inset 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Firefox Support (Versi lebih simpel karena keterbatasan browser) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #4CAF50 rgba(0,0,0,0.05);
+}
