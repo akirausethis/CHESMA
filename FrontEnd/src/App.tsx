@@ -10,17 +10,19 @@ import PrivateRoute from './middleware/middleware';
 import Login from './components/login';
 import Register from './components/register';
 import PrivateLayout from './components/privateLayout';
+import LandingPage from './components/LandingPage';
 
 const App = () => {
   return (
     <Router>
-      <div className="flex flex-row min-h-screen w-full bg-brand-bg font-sans text-text-main">
+      <div className="flex flex-row min-h-screen w-full bg-gray-50 font-sans text-gray-900">
         
         
         <main className="flex w-full justify-center items-start">
           <Routes>
-            <Route path='/' element={<Login/>}/>
-            <Route path='register' element={<Register/>}/>
+            <Route path='/' element={<LandingPage/>}/>
+            <Route path='/login' element={<Login/>}/>
+            <Route path='/register' element={<Register/>}/>
             <Route path='/*' element={
               <PrivateRoute>
                 <PrivateLayout/>

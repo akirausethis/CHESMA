@@ -14,6 +14,21 @@ import { logout } from '../apis/authAPI';
 import { useNavigate } from 'react-router-dom';
 
 function Profile() {
+  const [profilePic, setProfilePic] = React.useState(localStorage.getItem('profilePic_' + (localStorage.getItem('username') || '')));
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        localStorage.setItem('profilePic_' + (localStorage.getItem('username') || ''), base64String);
+        setProfilePic(base64String);
+        window.dispatchEvent(new Event('profilePicUpdated'));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   const username = localStorage.getItem('username') || 'User';
   const token = localStorage.getItem('token');
   const email = localStorage.getItem('email') || 'user@example.com';
@@ -31,71 +46,56 @@ function Profile() {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     localStorage.removeItem('email');
+    localStorage.removeItem('profilePic');
+    window.dispatchEvent(new Event('profilePicUpdated'));
 
     navigate('/');
   };
 
   return (
-    <div className="animate-fade-in pb-10 w-full px-5">
+    <div className="animate-fade-in w-full max-w-6xl mx-auto px-4 md:px-8 py-8">
       {/* ================= HERO HEADER ================= */}
-      <div className="relative mb-8 rounded-3xl overflow-hidden bg-gradient-to-r from-emerald-500 to-green-600 p-8 text-white shadow-2xl shadow-emerald-200">
-        <div className="absolute top-0 right-0 w-72 h-72 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
-        <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/10 rounded-full blur-3xl -ml-10 -mb-10"></div>
-
-        <div className="relative z-10 flex items-center gap-5">
-          <div className="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur flex items-center justify-center shadow-lg">
-            <ChefHat size={40} />
-          </div>
-
-          <div>
-            <p className="text-emerald-100 font-medium">
-              Personal Dashboard
-            </p>
-            <h1 className="text-4xl font-extrabold">
-              {username}
-            </h1>
-            <p className="text-emerald-100 mt-1">
-              Manage your account and culinary journey.
-            </p>
-          </div>
+      <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Personal Dashboard</h1>
+          <p className="text-gray-500 mt-2">
+            Manage your account and culinary journey.
+          </p>
         </div>
       </div>
 
       {/* ================= MAIN CONTENT ================= */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
         {/* ================= LEFT COLUMN ================= */}
-        <div className="lg:col-span-1 space-y-8">
+        <div className="lg:col-span-1 space-y-6">
           {/* Profile Card */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/60 overflow-hidden">
+          <div className="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden">
             {/* Cover */}
-            <div className="h-28 bg-gradient-to-r from-emerald-500 to-green-600 relative">
-              <div className="absolute inset-0 bg-white/5"></div>
-            </div>
+            <div className="h-24 bg-gradient-to-r from-emerald-400 to-emerald-500"></div>
 
             {/* Avatar */}
-            <div className="relative px-8 pb-8">
-              <div className="-mt-14 relative w-fit mx-auto">
-                <div className="w-28 h-28 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
+            <div className="relative px-6 pb-6">
+              <div className="-mt-12 relative w-fit mx-auto">
+                <div className="w-24 h-24 rounded-full border-4 border-white shadow-sm overflow-hidden bg-white">
                   <img
-                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      username
-                    )}&background=10b981&color=ffffff&size=300&bold=true`}
+                    src={profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=10b981&color=ffffff&size=300&bold=true`}
                     alt={username}
                     className="w-full h-full object-cover"
                   />
                 </div>
 
-                <button className="absolute bottom-1 right-1 w-9 h-9 rounded-full bg-white shadow-lg flex items-center justify-center text-gray-600 hover:text-emerald-600 transition">
-                  <Edit3 size={16} />
-                </button>
+                <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center text-gray-400 hover:text-emerald-600 hover:border-emerald-200 transition-colors cursor-pointer"><input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                  <Edit3 size={14} />
+                </label>
               </div>
 
               {/* Name */}
-              <div className="text-center mt-4">
-                <h2 className="text-2xl font-bold text-gray-900">
+              <div className="text-center mt-3">
+                <h2 className="text-xl font-bold text-gray-900">
                   {username}
                 </h2>
-                <p className="text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 mt-0.5">
                   Smart Kitchen Enthusiast
                 </p>
               </div>
@@ -111,25 +111,25 @@ function Profile() {
                 <Badge
                   icon={<Award size={12} />}
                   text="Home Chef"
-                  bg="bg-yellow-50"
-                  color="text-yellow-600"
+                  bg="bg-blue-50"
+                  color="text-blue-600"
                 />
               </div>
 
               {/* Info Rows */}
-              <div className="mt-6 space-y-3">
+              <div className="mt-6 space-y-2">
                 <InfoRow
-                  icon={<Mail size={18} />}
+                  icon={<Mail size={16} />}
                   label="Email"
                   value={email}
                 />
                 <InfoRow
-                  icon={<Phone size={18} />}
+                  icon={<Phone size={16} />}
                   label="Phone"
                   value="+62 812 3456 7890"
                 />
                 <InfoRow
-                  icon={<MapPin size={18} />}
+                  icon={<MapPin size={16} />}
                   label="Location"
                   value="Surabaya, Indonesia"
                 />
@@ -138,16 +138,16 @@ function Profile() {
           </div>
 
           {/* Logout Card */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/60 p-2">
+          <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-2">
             <button
               onClick={handleLogout}
-              className="w-full p-4 flex items-center justify-between text-red-500 hover:bg-red-50 rounded-2xl transition font-semibold"
+              className="w-full p-4 flex items-center justify-between text-red-500 hover:bg-red-50 rounded-xl transition font-bold text-sm"
             >
               <span className="flex items-center gap-3">
-                <LogOut size={20} />
-                Log Out
+                <LogOut size={18} />
+                Sign Out
               </span>
-              <ChevronRight size={18} />
+              <ChevronRight size={18} className="text-red-300" />
             </button>
           </div>
         </div>
@@ -155,30 +155,28 @@ function Profile() {
         {/* ================= RIGHT COLUMN ================= */}
         <div className="lg:col-span-2">
           {/* Feature Banner */}
-          <div className="relative overflow-hidden rounded-3xl shadow-2xl">
+          <div className="relative overflow-hidden rounded-[2rem] shadow-sm border border-gray-100 h-full min-h-[480px]">
             <img
               src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1400"
               alt="Fresh Ingredients"
-              className="w-full h-[520px] object-cover"
+              className="w-full h-full object-cover"
             />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
 
-            <div className="absolute bottom-0 left-0 right-0 p-8">
-              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur px-3 py-1.5 rounded-full text-white text-xs font-bold border border-white/20 mb-4">
-                <Sparkles size={12} />
-                CHESMA SMART KITCHEN
+            <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
+              <div className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-lg text-white text-[10px] uppercase tracking-widest font-bold border border-white/20 mb-4">
+                <ChefHat size={12} />
+                Chesma Smart Kitchen
               </div>
 
-              <h3 className="text-4xl font-extrabold text-white leading-tight mb-3">
-                Cook Smarter,
-                <br />
-                Live Healthier.
+              <h3 className="text-3xl md:text-5xl font-black text-white leading-tight mb-4 tracking-tight">
+                Cook Smarter,<br />Live Healthier.
               </h3>
 
-              <p className="text-gray-200 max-w-xl text-lg leading-relaxed">
+              <p className="text-gray-200 max-w-lg text-base md:text-lg leading-relaxed">
                 Use AI-powered ingredient scanning and recipe recommendations to
-                turn your pantry into delicious meals.
+                turn your pantry into delicious meals every single day.
               </p>
             </div>
           </div>
@@ -201,7 +199,7 @@ const Badge = ({
   color: string;
 }) => (
   <div
-    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${bg} ${color}`}
+    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold border border-white/50 ${bg} ${color}`}
   >
     {icon}
     {text}
@@ -218,8 +216,8 @@ const InfoRow = ({
   label: string;
   value: string;
 }) => (
-  <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50/30 transition">
-    <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-gray-400">
+  <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+    <div className="w-10 h-10 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 shrink-0">
       {icon}
     </div>
 
@@ -227,7 +225,7 @@ const InfoRow = ({
       <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
         {label}
       </p>
-      <p className="text-gray-900 font-semibold truncate">
+      <p className="text-gray-900 font-bold text-sm truncate mt-0.5">
         {value}
       </p>
     </div>
@@ -235,3 +233,5 @@ const InfoRow = ({
 );
 
 export default Profile;
+
+

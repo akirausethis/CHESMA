@@ -11,6 +11,7 @@ import {
   ClipboardList,
   BookOpen,
   ArrowRight,
+  Flame,
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
@@ -44,9 +45,7 @@ function RecipeDetail() {
     getMeal();
   }, [id, token]);
 
-  const formattedInstructions = instuctions
-    .split(/\r?\n\r?\n/)
-    .filter(Boolean);
+  const formattedInstructions = instuctions.split(/\r?\n+/).flatMap(block => block.split(/(?<=[a-z])\.\s+(?=[A-Z])/)).map(step => step.trim()).filter(step => step.length > 0).map(step => step.endsWith('.') || step.endsWith('!') ? step : step + '.');
 
   const availableIngredients = ingredients.filter(
     (ing) => ing.existsInPantry
@@ -182,20 +181,59 @@ function RecipeDetail() {
             {/* Instructions */}
             <div className="space-y-6">
               {formattedInstructions.length > 0 ? (
-                formattedInstructions.map((text, idx) => (
-                  <div
-                    key={idx}
-                    className="flex gap-4 p-5 rounded-2xl bg-gray-50 border border-gray-100"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white flex items-center justify-center font-bold shrink-0 shadow-lg">
-                      {idx + 1}
-                    </div>
+                formattedInstructions.map((text, idx) => {
+                  
+                  // Helper to extract actions
+                  const t = text.toLowerCase();
+                  const actions = [];
+                  if (t.match(/\b(cook|bake|fry|heat|boil|simmer|roast)\b/)) actions.push({ name: 'Heat', icon: <Flame size={14} /> });
+                  if (t.match(/\b(chop|cut|slice|dice|mince|trim|peel)\b/)) actions.push({ name: 'Prep', icon: <ChefHat size={14} /> });
+                  if (t.match(/\b(wash|pour|drain|juice|liquid)\b/)) actions.push({ name: 'Liquid', icon: <Flame size={14} /> }); // Fallback since Droplets might not be imported
+                  if (t.match(/\b(stir|mix|blend|whisk|combine)\b/)) actions.push({ name: 'Mix', icon: <ChefHat size={14} /> });
+                  
+                  // Extract ingredients
+                  const mentionedIngredients = ingredients.filter(ing => 
+                    t.includes(ing.name.toLowerCase())
+                  );
 
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                      {text}
-                    </p>
-                  </div>
-                ))
+                  return (
+                    <div
+                      key={idx}
+                      className="flex gap-4 p-5 rounded-2xl bg-gray-50 border border-gray-100 transition-all hover:shadow-md hover:bg-white group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white flex items-center justify-center font-bold shrink-0 shadow-md group-hover:scale-110 transition-transform">
+                        {idx + 1}
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                          {text}
+                        </p>
+                        
+                        {/* Visual Chips */}
+                        {(actions.length > 0 || mentionedIngredients.length > 0) && (
+                          <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200/60 mt-1">
+                            {/* Action Chips */}
+                            {actions.map((act, i) => (
+                              <div key={`act-${i}`} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-orange-600 border border-orange-100 text-xs font-bold uppercase tracking-wider">
+                                {act.icon}
+                                {act.name}
+                              </div>
+                            ))}
+
+                            {/* Ingredient Chips */}
+                            {mentionedIngredients.map((ing, i) => (
+                              <div key={`ing-${i}`} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-bold">
+                                <CheckCircle size={12} className="text-emerald-500" />
+                                {ing.name}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
               ) : (
                 <p className="text-gray-400">
                   Instructions are not available for this recipe.
@@ -323,3 +361,5 @@ const StatCard = ({
 );
 
 export default RecipeDetail;
+
+

@@ -14,21 +14,17 @@ import {
   ThumbsUp,
   Sparkles,
   Package,
-  ChefHat,
 } from 'lucide-react';
 
 function Pantry() {
-  // ================= STATE MANAGEMENT =================
   const [pantryItems, setPantryItems] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const token = localStorage.getItem('token');
 
-  // ================= FILTERED ITEMS =================
   const filteredItems = pantryItems.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // ================= FETCH DATA =================
   useEffect(() => {
     getIngredients();
   }, [token]);
@@ -40,7 +36,6 @@ function Pantry() {
     }
   };
 
-  // ================= DELETE ITEM =================
   const handleDeleteItem = async (id: number) => {
     if (token) {
       await deleteIngredients(id, token);
@@ -48,7 +43,6 @@ function Pantry() {
     }
   };
 
-  // ================= UPDATE QUANTITY =================
   const handleUpdateItem = async (id: number, value: number) => {
     if (!token) return;
 
@@ -72,51 +66,23 @@ function Pantry() {
   };
 
   return (
-    <div className="animate-fade-in w-full px-5 pb-10">
+    <div className="animate-fade-in w-full max-w-6xl mx-auto px-4 md:px-8 py-8">
       {/* ================= HERO HEADER ================= */}
-      <div className="mb-8 bg-gradient-to-r from-emerald-500 to-green-600 rounded-3xl p-8 text-white shadow-xl shadow-emerald-200 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-72 h-72 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
-        <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/10 rounded-full blur-3xl -ml-10 -mb-10"></div>
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center">
-              <ChefHat size={30} />
-            </div>
-
-            <div>
-              <h1 className="text-3xl font-extrabold">My Smart Pantry</h1>
-              <p className="text-emerald-100 mt-1">
-                Manage all your ingredients in one intelligent pantry.
-              </p>
-            </div>
-          </div>
-
-          <a
-            href="/scanPage"
-            className="bg-white text-emerald-600 px-6 py-3 rounded-2xl font-bold shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap"
-          >
-            <Plus size={20} />
-            Add Ingredients
-          </a>
+      <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">My Smart Pantry</h1>
+          <p className="text-gray-500 mt-2">
+            Manage all your ingredients in one intelligent pantry.
+          </p>
         </div>
-      </div>
 
-      {/* ================= SEARCH BAR ================= */}
-      <div className="mb-8 bg-white/90 backdrop-blur-sm rounded-3xl p-5 shadow-xl border border-white/60">
-        <div className="relative">
-          <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-            size={20}
-          />
-          <input
-            type="text"
-            placeholder="Search ingredients..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
-          />
-        </div>
+        <a
+          href="/scanPage"
+          className="bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-emerald-600 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap"
+        >
+          <Plus size={20} />
+          Add Ingredients
+        </a>
       </div>
 
       {/* ================= STATS CARDS ================= */}
@@ -125,7 +91,7 @@ function Pantry() {
           icon={<Package size={24} />}
           label="Total Items"
           value={pantryItems.length}
-          color="text-gray-800"
+          color="text-emerald-500"
           bgColor="bg-white"
         />
 
@@ -133,31 +99,47 @@ function Pantry() {
           icon={<ThumbsUp size={24} />}
           label="Pantry Health"
           value="100%"
-          color="text-emerald-600"
-          bgColor="bg-emerald-50"
+          color="text-blue-500"
+          bgColor="bg-white"
         />
       </div>
 
       {/* ================= PANTRY LIST ================= */}
-      <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/60 overflow-hidden min-h-[400px]">
+      <div className="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden min-h-[400px]">
         {/* Header */}
-        <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div className="p-6 md:p-8 border-b border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-xl font-bold text-gray-900">
               Pantry Inventory
             </h2>
             <p className="text-sm text-gray-500 mt-1">
               Review and manage your saved ingredients.
             </p>
           </div>
-
-          <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-full w-fit">
-            {filteredItems.length} Items Found
-          </span>
+          
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="relative w-full md:w-64">
+              <Search
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
+              <input
+                type="text"
+                placeholder="Search ingredients..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+              />
+            </div>
+            
+            <span className="hidden md:flex bg-emerald-50 text-emerald-600 text-xs font-bold px-3 py-1.5 rounded-lg border border-emerald-100 whitespace-nowrap">
+              {filteredItems.length} Items Found
+            </span>
+          </div>
         </div>
 
         {/* Rows */}
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-gray-100/60 p-2 md:p-4">
           {filteredItems.length > 0 ? (
             filteredItems.map((item) => (
               <PantryRow
@@ -170,14 +152,14 @@ function Pantry() {
             ))
           ) : (
             <div className="min-h-[320px] flex flex-col items-center justify-center text-center p-8">
-              <div className="w-20 h-20 rounded-3xl bg-emerald-50 flex items-center justify-center mb-4">
+              <div className="w-20 h-20 rounded-[1.5rem] bg-gray-50 border border-gray-100 flex items-center justify-center mb-5">
                 <Package
                   size={36}
-                  className="text-emerald-400"
+                  className="text-gray-300"
                 />
               </div>
 
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
+              <h3 className="text-lg font-bold text-gray-900 mb-2">
                 No Ingredients Found
               </h3>
 
@@ -190,7 +172,7 @@ function Pantry() {
               {!searchTerm && (
                 <a
                   href="/scanPage"
-                  className="mt-6 bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
+                  className="mt-6 bg-gray-900 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 inline-flex items-center gap-2"
                 >
                   <Plus size={18} />
                   Add Your First Ingredient
@@ -213,21 +195,19 @@ const StatCard = ({
   bgColor,
 }: any) => (
   <div
-    className={`${bgColor} p-6 rounded-3xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300`}
+    className={`${bgColor} p-6 rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center gap-5`}
   >
-    <div className="flex items-center gap-4">
-      <div
-        className={`w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center ${color}`}
-      >
-        {icon}
-      </div>
+    <div
+      className={`w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center ${color}`}
+    >
+      {icon}
+    </div>
 
-      <div>
-        <p className="text-sm font-medium text-gray-500">{label}</p>
-        <h4 className="text-3xl font-extrabold text-gray-900">
-          {value}
-        </h4>
-      </div>
+    <div>
+      <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{label}</p>
+      <h4 className="text-3xl font-black text-gray-900 tracking-tight mt-0.5">
+        {value}
+      </h4>
     </div>
   </div>
 );
@@ -240,28 +220,28 @@ const PantryRow = ({
   onSubstract,
 }: any) => {
   let statusStyle =
-    'bg-green-100 text-green-700 border-green-200';
+    'bg-emerald-50 text-emerald-600 border border-emerald-100';
   let statusIcon = <Leaf size={12} />;
   let statusText = 'Fresh';
 
   if (item.status === 'Expiring') {
     statusStyle =
-      'bg-orange-100 text-orange-700 border-orange-200';
+      'bg-orange-50 text-orange-600 border border-orange-100';
     statusIcon = <AlertTriangle size={12} />;
     statusText = 'Expiring Soon';
   } else if (item.status === 'Expired') {
     statusStyle =
-      'bg-red-100 text-red-700 border-red-200';
+      'bg-red-50 text-red-600 border border-red-100';
     statusIcon = <Trash2 size={12} />;
     statusText = 'Expired';
   }
 
   return (
-    <div className="group p-5 hover:bg-gray-50 transition-all duration-300">
+    <div className="group p-4 rounded-2xl hover:bg-gray-50/50 transition-colors duration-200">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         {/* Left Side */}
         <div className="flex items-center gap-4 min-w-0">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100/50 flex items-center justify-center flex-shrink-0">
             <Sparkles
               size={18}
               className="text-emerald-500"
@@ -269,46 +249,46 @@ const PantryRow = ({
           </div>
 
           <div className="min-w-0">
-            <h3 className="font-bold text-gray-900 text-lg truncate">
+            <h3 className="font-bold text-gray-900 text-base truncate capitalize">
               {item.name}
             </h3>
-            <p className="text-sm text-gray-400">
+            <p className="text-xs font-semibold text-gray-400 mt-0.5">
               Pantry Ingredient
             </p>
           </div>
         </div>
 
         {/* Right Side */}
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Quantity Stepper */}
-          <div className="flex items-center bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
             <button
               onClick={onSubstract}
-              className="px-3 py-2 text-gray-500 hover:bg-gray-50 transition"
+              className="px-3 py-2 text-gray-500 hover:bg-gray-100 transition"
             >
               <Minus size={14} />
             </button>
 
-            <span className="px-4 min-w-[60px] text-center font-bold text-gray-800">
+            <span className="px-3 min-w-[48px] text-center font-bold text-gray-800 text-sm">
               {item.quantity}
             </span>
 
             <button
               onClick={onAdd}
-              className="px-3 py-2 text-gray-500 hover:bg-gray-50 transition"
+              className="px-3 py-2 text-gray-500 hover:bg-gray-100 transition"
             >
               <Plus size={14} />
             </button>
           </div>
 
           {/* Unit */}
-          <span className="text-sm font-semibold text-gray-500 min-w-[50px] text-center">
+          <span className="text-xs font-bold text-gray-400 min-w-[40px] text-center uppercase tracking-wider">
             {item.unit}
           </span>
 
           {/* Status */}
           <div
-            className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold ${statusStyle}`}
+            className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${statusStyle}`}
           >
             {statusIcon}
             {statusText}
@@ -329,3 +309,4 @@ const PantryRow = ({
 };
 
 export default Pantry;
+

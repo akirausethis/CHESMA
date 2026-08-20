@@ -6,12 +6,14 @@ import {
   Minus,
   Type,
   Search,
-  Sparkles,
   Upload,
   Package,
   Save,
   ChefHat,
+  AlertCircle,
+  CheckCircle,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Ingredient } from '@/models/ingredient-model';
 import {
   saveIngredients as saveIngredientsAPI,
@@ -20,6 +22,8 @@ import {
 
 function ScanPage() {
   const [activeTab, setActiveTab] = useState('camera');
+  const [alertMsg, setAlertMsg] = useState('');
+  const [alertType, setAlertType] = useState<'error' | 'success'>('error');
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(0);
   const [unit, setUnit] = useState('pcs');
@@ -30,11 +34,12 @@ function ScanPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [items, setItems] = useState<Ingredient[]>([]);
+  const [scanAttempted, setScanAttempted] = useState(false);
 
   const addItem = () => {
     const trimmed = name.trim();
     if (!trimmed) {
-      alert('Please enter an ingredient name');
+      setAlertMsg('Please enter an ingredient name'); setAlertType('error');
       return;
     }
 
@@ -89,12 +94,12 @@ function ScanPage() {
     const token = localStorage.getItem('token');
 
     if (!token) {
-      alert('You must be logged in');
+      setAlertMsg('You must be logged in'); setAlertType('error');
       return;
     }
 
     if (items.length === 0) {
-      alert('No ingredients to save');
+      setAlertMsg('No ingredients to save'); setAlertType('error');
       return;
     }
 
@@ -107,24 +112,79 @@ function ScanPage() {
 
       await saveIngredientsAPI(payload, token);
 
-      alert('Ingredients saved to pantry ✅');
+      setAlertMsg('Ingredients saved to pantry ✅'); setAlertType('success');
       setItems([]);
     } catch (err) {
       console.error('Save ingredients failed:', err);
-      alert('Failed to save ingredients');
+      setAlertMsg('Failed to save ingredients'); setAlertType('error');
     }
   };
 
   return (
-    <div className="animate-fade-in w-full px-5 pb-10">
+    <div className="animate-fade-in w-full max-w-6xl mx-auto px-4 md:px-8 py-8">
+      {/* ================= CUSTOM MODAL OVERLAY ================= */}
+      <AnimatePresence>
+        {alertMsg && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl flex flex-col items-center text-center relative overflow-hidden"
+            >
+              {/* Top Accent Line */}
+              <div
+                className={`absolute top-0 left-0 right-0 h-1.5 ${
+                  alertType === 'success' ? 'bg-emerald-500' : 'bg-red-500'
+                }`}
+              ></div>
+
+              {/* Icon */}
+              <div
+                className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 shadow-inner ${
+                  alertType === 'success'
+                    ? 'bg-emerald-50 text-emerald-500'
+                    : 'bg-red-50 text-red-500'
+                }`}
+              >
+                {alertType === 'success' ? (
+                  <CheckCircle size={32} />
+                ) : (
+                  <AlertCircle size={32} />
+                )}
+              </div>
+
+              {/* Text */}
+              <h3 className="text-xl font-black text-gray-900 mb-2">
+                {alertType === 'success' ? 'Success!' : 'Oops!'}
+              </h3>
+              <p className="text-gray-500 font-medium mb-8 leading-relaxed">
+                {alertMsg}
+              </p>
+
+              {/* Action */}
+              <button
+                onClick={() => setAlertMsg('')}
+                className={`w-full py-3.5 rounded-2xl font-bold text-white transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 ${
+                  alertType === 'success'
+                    ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-200'
+                    : 'bg-red-500 hover:bg-red-600 shadow-red-200'
+                }`}
+              >
+                Got it
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
       {/* ================= LOADING OVERLAY ================= */}
       {uploading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl px-8 py-6 shadow-2xl border border-gray-100 flex flex-col items-center gap-4">
-            <div className="w-14 h-14 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="bg-white rounded-[2rem] p-8 shadow-2xl border border-gray-100 flex flex-col items-center gap-5">
+            <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
             <div className="text-center">
-              <p className="font-bold text-gray-800">Analyzing Image</p>
-              <p className="text-sm text-gray-500">
+              <p className="text-xl font-bold text-gray-900 mb-1">Analyzing Image</p>
+              <p className="text-gray-500">
                 AI is detecting your ingredients...
               </p>
             </div>
@@ -133,60 +193,47 @@ function ScanPage() {
       )}
 
       {/* ================= HERO HEADER ================= */}
-      <div className="mb-8 bg-gradient-to-r from-emerald-500 to-green-600 rounded-3xl p-8 text-white shadow-xl shadow-emerald-200 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
-
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
-            <Sparkles size={30} />
-          </div>
-
-          <div>
-            <h1 className="text-3xl font-extrabold">
-              AI Ingredient Scanner
-            </h1>
-            <p className="text-emerald-100 mt-1">
-              Scan or manually add ingredients to your pantry.
-            </p>
-          </div>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">AI Ingredient Scanner</h1>
+        <p className="text-gray-500 mt-2">Scan or manually add ingredients to your pantry.</p>
       </div>
 
       {/* ================= TAB SWITCHER ================= */}
-      <div className="flex flex-wrap gap-4 mb-8">
+      <div className="inline-flex bg-gray-100/80 p-1.5 rounded-xl mb-8">
         <button
           onClick={() => setActiveTab('camera')}
-          className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 flex items-center gap-2 ${
+          className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 ${
             activeTab === 'camera'
-              ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-200'
-              : 'bg-white text-gray-600 border border-gray-200 hover:shadow-md'
+              ? 'bg-white text-emerald-600 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
           }`}
         >
-          <Camera size={18} />
-          AI Camera Scan
+          <Camera size={16} />
+          AI Scan
         </button>
-
         <button
           onClick={() => setActiveTab('manual')}
-          className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 flex items-center gap-2 ${
+          className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 ${
             activeTab === 'manual'
-              ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-200'
-              : 'bg-white text-gray-600 border border-gray-200 hover:shadow-md'
+              ? 'bg-white text-emerald-600 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
           }`}
         >
-          <Type size={18} />
-          Manual Input
+          <Type size={16} />
+          Manual Entry
         </button>
       </div>
+
       {/* ================= MAIN CONTENT ================= */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
         {/* ================= LEFT PANEL ================= */}
-        <div className="bg-white/90 backdrop-blur-sm p-6 rounded-3xl shadow-xl border border-white/60 flex flex-col">
+        <div className="bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col">
           {activeTab === 'camera' ? (
             <>
               {/* Camera Mode Header */}
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                <h3 className="text-xl font-bold text-gray-900 mb-1">
                   Scan Your Groceries
                 </h3>
                 <p className="text-sm text-gray-500">
@@ -195,55 +242,52 @@ function ScanPage() {
               </div>
 
               {/* Upload Preview Area */}
-              <div className="relative flex-1 min-h-[420px] rounded-3xl overflow-hidden border-2 border-dashed border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 group">
-                <img
-                  src={
-                    previewUrl ??
-                    'https://www.instacart.com/company/_next/image?url=https%3A%2F%2Fimages.contentstack.io%2Fv3%2Fassets%2Fblta100b44b847ff4ca%2Fblt94c2cd5338f20ef5%2F68dc4296a07e11d2e2ad5ed2%2Ffun-food-facts-hero.jpg%3Fwidth%3D1050%26auto%3Dwebp&w=1920&q=75'
-                  }
-                  alt="Kitchen Counter"
-                  className="w-full h-full object-cover opacity-90"
-                />
-
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
-
-                {/* Center Icon */}
-                {!previewUrl && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                    <div className="w-20 h-20 bg-white/20 backdrop-blur rounded-3xl flex items-center justify-center mb-4">
-                      <Upload size={36} />
+              <div 
+                onClick={() => !previewUrl && fileInputRef.current?.click()}
+                className={`relative flex-1 min-h-[360px] rounded-2xl overflow-hidden border-2 border-dashed ${previewUrl ? 'border-transparent' : 'border-gray-200 bg-gray-50 cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30'} transition-all flex items-center justify-center group`}
+              >
+                {previewUrl ? (
+                  <>
+                    <img
+                      src={previewUrl}
+                      alt="Scan Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                       <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          fileInputRef.current?.click();
+                        }}
+                        className="bg-white text-gray-900 font-bold px-6 py-3 rounded-xl shadow-xl hover:scale-105 transition-transform flex items-center gap-2"
+                      >
+                        <Camera size={18} />
+                        Choose Another Image
+                      </button>
                     </div>
-                    <p className="text-lg font-bold">
-                      Upload Ingredient Image
-                    </p>
-                    <p className="text-sm text-white/80">
-                      JPG, PNG, or HEIC supported
-                    </p>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-gray-400 group-hover:text-emerald-500 transition-colors pointer-events-none p-6 text-center">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 border border-gray-100">
+                      <Upload size={28} />
+                    </div>
+                    <p className="text-gray-800 font-bold mb-1">Click to Upload Image</p>
+                    <p className="text-sm">JPG, PNG, or HEIC supported</p>
                   </div>
                 )}
-
-                {/* Upload Button */}
-                <div className="absolute bottom-6 left-0 right-0 flex justify-center">
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="bg-white text-gray-900 font-bold px-6 py-3 rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
-                  >
-                    <Camera size={18} />
-                    Capture & Detect
-                  </button>
-                </div>
               </div>
 
-              <p className="text-xs text-center text-gray-500 mt-4">
-                Our AI can detect multiple ingredients in a single image.
-              </p>
+              {!previewUrl && (
+                 <p className="text-xs text-center text-gray-400 mt-4">
+                   Our AI can detect multiple ingredients in a single image.
+                 </p>
+              )}
             </>
           ) : (
             <>
               {/* Manual Mode Header */}
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                <h3 className="text-xl font-bold text-gray-900 mb-1">
                   Manual Entry
                 </h3>
                 <p className="text-sm text-gray-500">
@@ -251,10 +295,10 @@ function ScanPage() {
                 </p>
               </div>
 
-              <div className="flex-1 flex flex-col gap-5">
+              <div className="flex-1 flex flex-col gap-6">
                 {/* Ingredient Name */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
                     Ingredient Name
                   </label>
                   <div className="relative">
@@ -267,7 +311,7 @@ function ScanPage() {
                       onChange={(e) => setName(e.target.value)}
                       type="text"
                       placeholder="e.g., Cheddar Cheese"
-                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                      className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
                     />
                   </div>
                 </div>
@@ -276,7 +320,7 @@ function ScanPage() {
                 <div className="grid grid-cols-2 gap-4">
                   {/* Quantity */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
                       Quantity
                     </label>
                     <input
@@ -293,20 +337,20 @@ function ScanPage() {
                         setQuantity(Number.isNaN(parsed) ? 0 : parsed);
                       }}
                       placeholder="0"
-                      className="w-full px-4 py-3.5 rounded-2xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                      className="w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
                     />
                   </div>
 
                   {/* Unit */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
                       Unit
                     </label>
 
                     <select
                       value={unit}
                       onChange={(e) => setUnit(e.target.value)}
-                      className="w-full px-4 py-3.5 rounded-2xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition appearance-none cursor-pointer"
+                      className="w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition appearance-none cursor-pointer"
                     >
                       <option value="pcs">pcs</option>
                       <option value="kg">kg</option>
@@ -322,7 +366,7 @@ function ScanPage() {
                         value={customUnit}
                         onChange={(e) => setCustomUnit(e.target.value)}
                         placeholder="Enter custom unit"
-                        className="mt-3 w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                        className="mt-3 w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
                       />
                     )}
                   </div>
@@ -332,7 +376,7 @@ function ScanPage() {
                 <div className="mt-auto pt-4">
                   <button
                     onClick={addItem}
-                    className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white font-bold py-3.5 rounded-2xl shadow-lg hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2"
+                    className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2"
                   >
                     <Plus size={18} />
                     Add to List
@@ -342,22 +386,23 @@ function ScanPage() {
             </>
           )}
         </div>
+
         {/* ================= RIGHT PANEL ================= */}
-        <div className="bg-white/90 backdrop-blur-sm p-6 rounded-3xl shadow-xl border border-white/60 flex flex-col h-full">
+        <div className="bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col h-full min-h-[500px]">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">
+              <h3 className="text-xl font-bold text-gray-900">
                 {activeTab === 'camera'
                   ? 'Detected Items'
                   : 'Items to Add'}
               </h3>
               <p className="text-sm text-gray-500 mt-1">
-                Review and adjust your ingredients before saving.
+                Review and adjust before saving.
               </p>
             </div>
 
-            <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-full">
+            <span className="bg-emerald-50 text-emerald-600 text-xs font-bold px-3 py-1.5 rounded-lg border border-emerald-100">
               {items.length} Items
             </span>
           </div>
@@ -378,22 +423,15 @@ function ScanPage() {
 
             {/* Empty State */}
             {items.length === 0 && (
-              <div className="h-full min-h-[320px] flex flex-col items-center justify-center text-center">
-                <div className="w-20 h-20 rounded-3xl bg-emerald-50 flex items-center justify-center mb-4">
+              <div className="h-full flex flex-col items-center justify-center text-center px-4 py-12">
+                <div className="w-20 h-20 rounded-[1.5rem] bg-gray-50 flex items-center justify-center mb-5 border border-gray-100">
                   <Package
                     size={36}
-                    className="text-emerald-400"
+                    className="text-gray-300"
                   />
                 </div>
-
-                <h4 className="text-lg font-bold text-gray-800 mb-1">
-                  No Ingredients Yet
-                </h4>
-
-                <p className="text-sm text-gray-500 max-w-xs">
-                  Scan an image or manually add ingredients to build
-                  your pantry list.
-                </p>
+                <h4 className="text-lg font-bold text-gray-900 mb-2">{scanAttempted ? 'No Ingredients Found' : 'No Ingredients Yet'}</h4>
+                <p className="text-sm text-gray-500 max-w-[240px]">{scanAttempted ? "We couldn't detect any food ingredients in this image. Try uploading a different photo!" : 'Scan an image or manually add ingredients to build your pantry list.'}</p>
               </div>
             )}
           </div>
@@ -410,7 +448,7 @@ function ScanPage() {
 
               const token = localStorage.getItem('token');
               if (!token) {
-                alert('Please login to use the scanner.');
+                setAlertMsg('Please login to use the scanner.'); setAlertType('error');
                 return;
               }
 
@@ -424,11 +462,7 @@ function ScanPage() {
                 const detectedObjects =
                   result.data?.detected_ingredients || [];
 
-                if (detectedObjects.length === 0) {
-                  alert(
-                    'No ingredients detected. Try a clearer image.'
-                  );
-                } else {
+                
                   const newIngredients: Ingredient[] =
                     detectedObjects.map((ingredient: any) => ({
                       name: ingredient.name,
@@ -440,18 +474,12 @@ function ScanPage() {
                     ...prev,
                     ...newIngredients,
                   ]);
-                }
               } catch (err: any) {
                 console.error('upload error', err);
-                alert(
-                  'Upload failed: ' +
-                    (err?.message || String(err))
-                );
+                setAlertMsg('Upload failed: ' + (err?.message || String(err))); setAlertType('error');
               } finally {
                 setUploading(false);
-                setSelectedFile(null);
-                setPreviewUrl(null);
-
+        setScanAttempted(true);
                 if (fileInputRef.current) {
                   fileInputRef.current.value = '';
                 }
@@ -463,7 +491,8 @@ function ScanPage() {
           <div className="mt-6 pt-6 border-t border-gray-100">
             <button
               onClick={saveIngredients}
-              className="w-full bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold py-4 rounded-2xl shadow-xl shadow-emerald-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2"
+              disabled={items.length === 0}
+              className="w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-emerald-600 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-not-allowed"
             >
               <Save size={18} />
               Save to Pantry
@@ -495,15 +524,15 @@ function DetectedItemRow({
   onRemove,
 }: DetectedProps) {
   return (
-    <div className="group flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-white rounded-2xl border border-gray-100 hover:border-emerald-200 hover:shadow-md transition-all duration-300">
+    <div className="group flex items-center gap-4 p-3.5 bg-white rounded-xl border border-gray-100 hover:border-gray-200 shadow-sm hover:shadow transition-all duration-200">
       {/* Ingredient Icon */}
-      <div className="w-11 h-11 rounded-2xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+      <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
         <ChefHat size={18} className="text-emerald-500" />
       </div>
 
       {/* Ingredient Name */}
       <div className="flex-1 min-w-0">
-        <h4 className="font-bold text-gray-800 truncate">
+        <h4 className="font-bold text-gray-900 text-sm truncate capitalize">
           {name}
         </h4>
         <p className="text-xs text-gray-400">
@@ -514,35 +543,35 @@ function DetectedItemRow({
       {/* Controls */}
       <div className="flex items-center gap-3">
         {/* Quantity Stepper */}
-        <div className="flex items-center bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="flex items-center bg-gray-50 rounded-lg border border-gray-100 overflow-hidden">
           <button
             onClick={onDecrease}
-            className="px-2.5 py-2 hover:bg-gray-50 text-gray-500 transition"
+            className="px-2 py-1.5 hover:bg-gray-200 text-gray-500 transition"
           >
             <Minus size={12} />
           </button>
 
-          <span className="text-sm font-bold px-2 min-w-[36px] text-center">
+          <span className="text-sm font-bold px-2 min-w-[32px] text-center text-gray-700">
             {qty}
           </span>
 
           <button
             onClick={onIncrease}
-            className="px-2.5 py-2 hover:bg-gray-50 text-gray-500 transition"
+            className="px-2 py-1.5 hover:bg-gray-200 text-gray-500 transition"
           >
             <Plus size={12} />
           </button>
         </div>
 
         {/* Unit */}
-        <span className="text-xs font-semibold text-gray-500 min-w-[36px]">
+        <span className="text-xs font-bold text-gray-400 min-w-[32px]">
           {unit}
         </span>
 
         {/* Remove */}
         <button
           onClick={onRemove}
-          className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+          className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
         >
           <Trash2 size={16} />
         </button>
@@ -552,3 +581,11 @@ function DetectedItemRow({
 }
 
 export default ScanPage;
+
+
+
+
+
+
+
+

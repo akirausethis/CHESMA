@@ -17,16 +17,16 @@ function Dashboard() {
       <header className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
         {/* Greeting */}
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-light text-brand-primary text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-bold uppercase tracking-wider mb-3">
             <Sparkles size={12} />
             Smart Nutrition Assistant
           </div>
 
-          <h2 className="text-4xl font-extrabold text-brand-dark leading-tight">
+          <h2 className="text-4xl font-extrabold text-gray-900 leading-tight">
             Hello, Chef Kenny 👋
           </h2>
 
-          <p className="text-text-muted mt-2 max-w-xl">
+          <p className="text-gray-500 mt-2 max-w-xl">
             Discover healthy recipes, scan ingredients with AI, and get
             personalized meal recommendations based on your pantry.
           </p>
@@ -34,19 +34,19 @@ function Dashboard() {
 
         {/* Profile & Notification */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3 bg-white pl-2 pr-4 py-2 rounded-2xl shadow-soft border border-gray-100">
+          <div className="flex items-center gap-3 bg-white pl-2 pr-4 py-2 rounded-2xl shadow-xl border-white/60 backdrop-blur-sm border border-gray-100">
             <img
               src="https://i.pravatar.cc/150?img=11"
               alt="Profile"
               className="w-10 h-10 rounded-xl border-2 border-brand-light"
             />
             <div>
-              <p className="text-sm font-bold text-brand-dark">Kenny</p>
-              <p className="text-[11px] text-text-muted">Healthy Chef</p>
+              <p className="text-sm font-bold text-gray-900">Kenny</p>
+              <p className="text-[11px] text-gray-500">Healthy Chef</p>
             </div>
           </div>
 
-          <button className="w-11 h-11 bg-white rounded-2xl flex items-center justify-center shadow-soft border border-gray-100 relative hover:bg-gray-50 transition">
+          <button className="w-11 h-11 bg-white rounded-2xl flex items-center justify-center shadow-xl border-white/60 backdrop-blur-sm border border-gray-100 relative hover:bg-gray-50 transition">
             <Bell size={20} className="text-gray-600" />
             <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
           </button>
@@ -58,7 +58,7 @@ function Dashboard() {
         {/* ============ LEFT SIDE ============ */}
         <div className="xl:col-span-2 space-y-6">
           {/* Hero Banner */}
-          <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 p-8 text-white shadow-soft">
+          <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 p-8 text-white shadow-xl border-white/60 backdrop-blur-sm">
             <div className="absolute top-0 right-0 w-72 h-72 bg-white/10 rounded-full blur-3xl -translate-y-20 translate-x-20"></div>
 
             <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -98,24 +98,24 @@ function Dashboard() {
           </section>
 
           {/* Today's Meal Plan */}
-          <section className="bg-white p-6 rounded-3xl shadow-soft border border-gray-100">
+          <section className="bg-white p-6 rounded-3xl shadow-xl border-white/60 backdrop-blur-sm border border-gray-100">
             <div className="flex justify-between items-start mb-5">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-brand-light flex items-center justify-center text-brand-primary">
+                <div className="w-11 h-11 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
                   <Calendar size={20} />
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-lg text-brand-dark">
+                  <h3 className="font-bold text-lg text-gray-900">
                     Today's Meal Plan
                   </h3>
-                  <p className="text-xs text-text-muted">
+                  <p className="text-xs text-gray-500">
                     Personalized for your dietary goals
                   </p>
                 </div>
               </div>
 
-              <span className="px-3 py-1 bg-brand-light text-brand-primary text-xs font-bold rounded-full">
+              <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full">
                 1,800 Kcal
               </span>
             </div>
@@ -143,7 +143,7 @@ function Dashboard() {
                   key={item.meal}
                   className={`p-4 rounded-2xl border transition ${
                     item.recommended
-                      ? 'bg-brand-light border-brand-primary shadow-sm scale-[1.02]'
+                      ? 'bg-emerald-50 border-emerald-500 shadow-sm scale-[1.02]'
                       : 'bg-gray-50 border-gray-100'
                   }`}
                 >
@@ -155,11 +155,11 @@ function Dashboard() {
                     </span>
 
                     {item.recommended && (
-                      <ThumbsUp size={12} className="text-brand-primary" />
+                      <ThumbsUp size={12} className="text-emerald-600" />
                     )}
                   </div>
 
-                  <p className="font-semibold text-brand-dark text-sm">
+                  <p className="font-semibold text-gray-900 text-sm">
                     {item.name}
                   </p>
                 </div>
@@ -168,13 +168,13 @@ function Dashboard() {
           </section>
 
           {/* AI Scanner */}
-          <section className="bg-white p-6 rounded-3xl shadow-soft border border-gray-100">
+          <section className="bg-white p-6 rounded-3xl shadow-xl border-white/60 backdrop-blur-sm border border-gray-100">
             <div className="flex justify-between items-center mb-5">
               <div>
-                <h3 className="font-bold text-lg text-brand-dark">
+                <h3 className="font-bold text-lg text-gray-900">
                   AI Ingredient Scanner
                 </h3>
-                <p className="text-xs text-text-muted">
+                <p className="text-xs text-gray-500">
                   Detect ingredients instantly using computer vision
                 </p>
               </div>
@@ -204,7 +204,7 @@ function Dashboard() {
               <div className="absolute inset-0 flex items-center justify-center">
                 <a
                   href="/scanPage"
-                  className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-full font-bold hover:bg-brand-primary hover:border-brand-primary transition-all shadow-xl"
+                  className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-full font-bold hover:bg-emerald-500 hover:border-emerald-500 transition-all shadow-xl"
                 >
                   <Camera size={18} />
                   Start New Scan
@@ -217,7 +217,7 @@ function Dashboard() {
         {/* ============ RIGHT SIDEBAR ============ */}
         <div className="space-y-6">
           {/* Recommended Recipe */}
-          <section className="bg-white rounded-3xl shadow-soft border border-gray-100 overflow-hidden">
+          <section className="bg-white rounded-3xl shadow-xl border-white/60 backdrop-blur-sm border border-gray-100 overflow-hidden">
             <div className="relative h-52">
               <img
                 src="https://images.unsplash.com/photo-1597362925123-77861d3fbac7?auto=format&fit=crop&q=80&w=600"
@@ -232,20 +232,20 @@ function Dashboard() {
             </div>
 
             <div className="p-6">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
                 Recommended Lunch
               </span>
 
-              <h3 className="text-2xl font-bold text-brand-dark mt-2 mb-2">
+              <h3 className="text-2xl font-bold text-gray-900 mt-2 mb-2">
                 Spinach Omelette
               </h3>
 
-              <p className="text-sm text-text-muted leading-relaxed mb-5">
+              <p className="text-sm text-gray-500 leading-relaxed mb-5">
                 High in protein and perfectly utilizes the fresh spinach
                 available in your pantry.
               </p>
 
-              <button className="w-full bg-brand-light text-brand-dark font-bold py-3 rounded-2xl hover:bg-brand-primary hover:text-white transition flex items-center justify-center gap-2">
+              <button className="w-full bg-emerald-50 text-gray-900 font-bold py-3 rounded-2xl hover:bg-emerald-500 hover:text-white transition flex items-center justify-center gap-2">
                 Start Cooking
                 <ArrowRight size={16} />
               </button>
@@ -253,8 +253,8 @@ function Dashboard() {
           </section>
 
           {/* Nutrition Summary */}
-          <section className="bg-white p-6 rounded-3xl shadow-soft border border-gray-100">
-            <h3 className="font-bold text-lg text-brand-dark mb-4">
+          <section className="bg-white p-6 rounded-3xl shadow-xl border-white/60 backdrop-blur-sm border border-gray-100">
+            <h3 className="font-bold text-lg text-gray-900 mb-4">
               Nutrition Summary
             </h3>
 
@@ -266,10 +266,10 @@ function Dashboard() {
               ].map((item) => (
                 <div key={item.label}>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium text-brand-dark">
+                    <span className="font-medium text-gray-900">
                       {item.label}
                     </span>
-                    <span className="text-text-muted">
+                    <span className="text-gray-500">
                       {item.value} • {item.percent}
                     </span>
                   </div>
@@ -284,13 +284,13 @@ function Dashboard() {
               ))}
             </div>
 
-            <div className="mt-5 p-4 rounded-2xl bg-brand-light flex items-center gap-3">
-              <Flame size={18} className="text-brand-primary" />
+            <div className="mt-5 p-4 rounded-2xl bg-emerald-50 flex items-center gap-3">
+              <Flame size={18} className="text-emerald-600" />
               <div>
-                <p className="text-sm font-bold text-brand-dark">
+                <p className="text-sm font-bold text-gray-900">
                   1,850 Calories
                 </p>
-                <p className="text-xs text-text-muted">
+                <p className="text-xs text-gray-500">
                   Daily target almost achieved
                 </p>
               </div>

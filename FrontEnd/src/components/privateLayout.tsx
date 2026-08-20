@@ -11,7 +11,7 @@ import RecipeDetail from './RecipeDetail'
 
 function PrivateLayout() {
   return (
-    <div className="flex flex-row min-h-screen w-full bg-brand-bg font-sans text-text-main">
+    <div className="flex flex-row min-h-screen w-full bg-gray-50 font-sans text-gray-900">
       <Sidebar />
       <main className="flex w-full ml-64 justify-center items-start pt-10">
         <Routes>
@@ -28,3 +28,4 @@ function PrivateLayout() {
 }
 
 export default PrivateLayout
+
